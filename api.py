@@ -20,7 +20,7 @@ def get_db():
 # Routes
 @api.route('/')
 def ping_server():
-    return "Welcome to the world of Mongo!"
+    return jsonify({"Welcome":"Welcome to the world of Mongo!"})
 
 @api.route('/animals')
 def get_stored_animals():
@@ -35,6 +35,25 @@ def get_stored_animals():
     finally:
         if type(db)==MongoClient:
             db.close()
+
+@api.route('/animals/wild')
+def get_stored_animals_wild():
+    db=""
+    try:
+        db = get_db()
+        _animals = db.animal_tb.find()
+        animals = [{"id": animal["id"], "name": animal["name"], "type": animal["type"]} for animal in _animals]   
+        
+        ##listing the animals Wild
+        AnimalWildList = [x for x in animals if x["type"] == "Wild"]            
+      
+        return jsonify({"animals": AnimalWildList})
+    except:
+        pass
+    finally:
+        if type(db)==MongoClient:
+            db.close()
+
 
 if __name__=='__main__':
     api.run(host="0.0.0.0", port=5000, debug=True)
